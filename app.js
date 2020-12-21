@@ -8,10 +8,10 @@ const gridItem = document.querySelector('.grid-item');
  * @description Represents all dinosaurs as WildReptiles
  * @constructor
  * @param {string} title - The species Name
- * @param {lbs} weight - The weight of the species
- * @param {inches} height - Height of the species
+ * @param {number} weight - The weight of the species
+ * @param {number} height - Height of the species
  * @param {string} diet - Diet of the species
- * @param {picture} image - species image
+ * @param image - species image
  */
 function WildReptiles(species, weight, height, diet, image) {
   this.species = species;
@@ -21,60 +21,62 @@ function WildReptiles(species, weight, height, diet, image) {
   this.image = image;
 }
 
+
 /**
  * @description Represents Dino obejects that extends WildReptiles
  * @constructor
  * @param {string} species - The species Name
- * @param {lbs} weight - The weight of the species
- * @param {inches} height - Height of the species
+ * @param {number} weight - The weight of the species
+ * @param {number} height - Height of the species
  * @param {string} diet - Diet of the species
  * @param {string} where - where species is from
  * @param {string} when - time era of the species
  * @param {string} fact - Facts about the species
+ * @param image - species image
  */
 function Dino(species, weight, height, diet, where, when, fact, image) {
-  WildReptiles.call(this, species, weight, height, when, diet, image)
-  this.species = species;
-  this.weight = weight;
-  this.height = height;
-  this.diet = diet;
+  WildReptiles.call(this, species, weight, height, diet, image);
+
   this.where = where;
   this.when = when;
   this.fact = fact;
-  this.image = image;
+
 }
+
+//Createa a new instance of Dino Object from the WildReptiles protoype object
+Dino.prototype = Object.create(WildReptiles.prototype);
+Dino.prototype.constructor = Dino;
 
 /**
  * @description Represents Human obejects that extends WildReptiles
  * @constructor
- * @param {string} name - The species Name
- * @param {lbs} weight - The weight of the species
- * @param {inches} height - Height of the species inches
- * @param {inches} feet - Height of the species in feet which is 1 * 12inches
- * @param {string} diet - species diet
- * @param{picture} image - species image
+ * @param {string} species - Human Name
+ * @param {number} weight - Human Weight
+ * @param {number} htInch - Human height in inches
+ * @param {number} feetInch - Human Height convert feet to inchers which is 1 * 12inches
+ * @param {string} diet - HUman diet
+ * @param image - Human image
  */
-function Human(species, weight, feet, inches, diet, image) {
-  WildReptiles.call(this, species, weight, diet, image)
+function Human(species, weight, htInch, feetInch, diet, image) {
+  WildReptiles.call(this, species, weight, diet, image);
   this.species = species;
   this.weight = weight;
-  this.height = feet;
-  this.where = inches;
-  this.diet = diet;
+  this.htInch = htInch;
+  this.feetInch = feetInch;
   this.image = image;
 }
 
+//A new instance of Human obejct from the specified WildReptiles prototype
+Human.prototype = Object.create(WildReptiles.prototype);
+Human.prototype.constructor = Human;
 
 // Idea got from https://knoweledge.udacity.com
 /**
  * @description fetches DINO species array from json and stores in an object
- * @description createGridCard to append grid tiles with title, image and facts to the DOM
- * @description compare methods for comapring weight, height and diet between Human and Dino species
- * @decriotion getRandom facts for each species everytime the user clicks button
  */
 const createDinoInfoGraph = () => {
   (async () => {
-    const dino = await fetch("dino.json")
+    const dino = await fetch('dino.json')
       .then(result => result.json())
       .then(result => result.Dinos);
 
@@ -94,24 +96,18 @@ const createDinoInfoGraph = () => {
       return this.fact[Math.floor(Math.random() * this.fact.length)];
     };
 
-    //facts from 3 compare methods and 3 more facts to be stored in facts array
-    Dino.prototype.addFact = function(fact) {
-      this.fact.push(fact);
-    };
-
-
     // Instantiate a new Human Object
     const human = new Human();
     // use IIFE to get user input from the Form data
     const getHumanData = () => {
       (function(human) {
-        human.image = "images/human.png";
+        human.image = 'images/human.png';
         human.species = document.getElementById('name').value;
         human.diet = document.getElementById('diet').value;
         human.weight = document.getElementById('weight').value;
         human.feet = document.getElementById('feet').value;
         human.inches = document.getElementById('inches').value;
-        human.fact = "";
+        human.fact = '';
       })(human);
     };
 
@@ -119,8 +115,58 @@ const createDinoInfoGraph = () => {
     //Idea got from https://knoweledge.udacity.com
     dinos.splice(4, 0, human);
 
-    // Craete Grid Tile Items (Cards) with each tile having a title , image and facts
-    // and add them dynamically to the base Grid Div Element
+    /**
+     * @description compareWeight compares human weight with Dino Species weight
+     * @returns wtFact
+     */
+    Dino.prototype.compareWeight = function() {
+      let wtFact = '';
+      if (human.weight < this.weight) {
+        wtFact = `The ${this.species} weighs ${this.weight - human.weight} lbs more than ${human.species}!`;
+      } else if (this.weight < human.weight) {
+        wtFact = `The ${this.species} weighs ${human.weight - this.weight} lbs less than ${human.species}!`;
+      }
+
+      return wtFact;
+    };
+
+    /**
+     * @description compareHeight compares Human height in Inches  with Dino Species
+     * @returns htFact
+     */
+    Dino.prototype.compareHeight = function() {
+      let htFact = '';
+      const humanInches = parseInt(human.feet * 12) + parseInt(human.inches);
+      if (humanInches < this.height) {
+        htFact = `${human.species} is ${this.height - humanInches} inches shorter than ${this.species}!`;
+      } else if (this.height < humanInches) {
+        htFact = `${human.species} is ${humanInches - this.height} inches taller than ${this.species}!`;
+      }
+      return htFact;
+    };
+
+    /**
+     * @description compareDiet compares Human diet with Dino Species
+     * @returns dietFact
+     */
+    Dino.prototype.compareDiet = function() {
+      let dietFact = '';
+      if (human.diet === 'Carnivor' && this.diet === 'carnivor') {
+        dietFact = `${human.species} has the same diet as a ${this.species}!`;
+      } else if (human.diet === 'Herbavor' && this.diet === 'herbavor') {
+        dietFact = `${human.species} has the same diet as a ${this.species}!`;
+      } else {
+        dietFact = `${human.species}'s diet doesn't match this Dinosaur.`;
+      }
+      return dietFact;
+
+    };
+
+
+    /**
+     * @decription  Craete Grid Tile Items (Cards) with each tile having a title , image and facts
+     * @description and add them dynamically to the base Grid Div Element
+     */
     const createGridCard = () => {
 
       for (let i = 0; i < GRIDTILES; i++) {
@@ -142,51 +188,10 @@ const createDinoInfoGraph = () => {
 
         //Create Compare methods for Weight, Height and Diet properties for Human and DinoSpecies
         const dinoObj = dinos[i];
-        let wtFact = "";
-        let htFact = "";
-        let dietFact = "";
-
-        //compareWeight compares Human weight with Dino Species
-        //and returns the Weight Fact
-        Dino.prototype.compareWeight = function() {
-          if (human.weight < dinoObj.weight) {
-            wtFact = `The ${dinoObj.species} weighs ${dinoObj.weight - human.weight} lbs more than ${human.species}!`;
-          } else if (dinoObj.weight < human.weight) {
-            wtFact = `The ${dinoObj.species} weighs ${human.weight - dinoObj.weight} lbs less than ${human.species}!`;
-          }
-
-          return wtFact;
-        };
-
-        //compareHeight compares Human height in Inches  with Dino Species
-        //and returns the height Fact
-        Dino.prototype.compareHeight = function() {
-          const humanInches = parseInt(human.feet * 12) + parseInt(human.inches);
-          if (humanInches < dinoObj.height) {
-            htFact = `${human.species} is ${dinoObj.height - humanInches} inches shorter than ${dinoObj.species}!`;
-          } else if (dinoObj.height < humanInches) {
-            htFact = `${human.species} is ${humanInches - dinoObj.height} inches taller than ${dinoObj.species}!`;
-          }
-          return htFact;
-        };
-
-        //compareDiet compares Human diet with Dino Species
-        //and returns the diet Fact
-        Dino.prototype.compareDiet = function() {
-          if (human.diet === "Carnivor" && dinoObj.diet === "carnivor") {
-            dietFact = `${human.species} has the same diet as a ${dinoObj.species}!`;
-          } else if (human.diet === "Herbavor" && dinoObj.diet === "herbavor") {
-            dietFact = `${human.species} has the same diet as a ${dinoObj.species}!`;
-          } else {
-            dietFact = `${human.species}'s diet doesn't match this Dinosaur.`;
-          }
-          return dietFact;
-
-        };
 
         //Add the compare Facts from the above compare Methods to the Dinos array
         if (typeof dinos[i].fact === 'string') {
-          factDiv.innerHTML = "";
+          factDiv.innerHTML = '';
         } else {
 
           dinos[i].fact.push(dinoObj.compareWeight(), dinoObj.compareDiet(), dinoObj.compareHeight());
@@ -213,7 +218,7 @@ const createDinoInfoGraph = () => {
  */
 function hideForm() {
 
-  document.getElementById("dino-compare").style.display = "none";
+  document.getElementById('dino-compare').style.display = 'none';
 };
 
 /**
@@ -221,8 +226,8 @@ function hideForm() {
  * @description And Hide Human Data Form
  *
  */
-document.getElementById("btn")
-  .addEventListener("click", function() {
+document.getElementById('btn')
+  .addEventListener('click', function() {
     hideForm();
     createDinoInfoGraph();
   });
