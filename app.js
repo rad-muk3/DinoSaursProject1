@@ -184,8 +184,6 @@ const createDinoInfoGraph = () => {
         titleDiv.innerHTML = dinos[i].species;
         imgDiv.setAttribute('src', dinos[i].image);
 
-
-
         //Create Compare methods for Weight, Height and Diet properties for Human and DinoSpecies
         const dinoObj = dinos[i];
 
