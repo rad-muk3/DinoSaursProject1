@@ -22,7 +22,7 @@ function WildReptiles(species, weight, height, facts, diet, image) {
  * @param {string} fact - Species facts
  *
  */
-WildReptiles.prototype.addFact = function(fact) {
+WildReptiles.prototype.addComparedFacts = function(fact) {
   this.facts.push(fact);
 };
 
@@ -41,7 +41,7 @@ WildReptiles.prototype.compareDietFacts = function(diet) {
     fact = 'We have different diets!';
   }
 
-  this.addFact(fact);
+  this.addComparedFacts(fact);
 };
 
 /**
@@ -55,7 +55,7 @@ WildReptiles.prototype.compareWeightFacts = function(weight) {
   } else if (this.weight < weight) {
     fact = 'Wow!Human, you weigh more than me!';
   }
-  this.addFact(fact);
+  this.addComparedFacts(fact);
 };
 
 /**
@@ -69,7 +69,7 @@ WildReptiles.prototype.compareHeightFacts = function(height) {
   } else if (this.height < height) {
     fact = 'Wow!Human, you are way taller than me!';
   }
-  this.addFact(fact);
+  this.addComparedFacts(fact);
 };
 
 /**
@@ -129,7 +129,15 @@ let dinos = [];
 //fetches DINO species array from json and stores in an object
 fetch("dino.json")
   .then(response => response.json())
-  .then(json => dinos = json.Dinos.map(dino => new Dino(dino.species, dino.weight, dino.height, dino.fact, dino.diet, dino.where, dino.when, dino.image)));
+  .then(json => dinos = json.Dinos.map(dino => new Dino(
+    dino.species,
+    dino.weight,
+    dino.height,
+    dino.fact,
+    dino.diet,
+    dino.where,
+    dino.when,
+    dino.image)));
 
 /**
  * @description getHuman gets all the form input data for human . Uses IIFE
